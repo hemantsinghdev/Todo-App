@@ -1,9 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v15-appRouter";
-import { ThemeProvider } from "@mui/material";
-import CssBaseline from "@mui/material/CssBaseline";
-import theme from "@/theme/theme";
+import ThemeRegistry from "@/theme/ThemeRegistry";
 
 export const metadata: Metadata = {
   title: "Todo App",
@@ -19,10 +17,9 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <AppRouterCacheProvider>
-          <ThemeProvider theme={theme}>
-            <CssBaseline />
-              {children}
-        </ThemeProvider>
+          <ThemeRegistry>  
+            {children}
+          </ThemeRegistry>
         </AppRouterCacheProvider>
       </body>
     </html>
