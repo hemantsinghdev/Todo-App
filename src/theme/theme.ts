@@ -51,15 +51,16 @@ const theme = createTheme({
   },
   components: {
     MuiCssBaseline: {
-      styleOverrides: {
-        body: ({ theme }: { theme: Theme }) => ({
-          backgroundColor: theme.palette.background.default,
-          color: theme.palette.text.primary,
-          margin: 0,
-          padding: 0,
-          minHeight: "100vh",
-        }),
-      },
+      styleOverrides: (theme) => `
+        body{
+          background-color: ${theme.palette.background.default};
+          color: ${theme.palette.text.primary};
+          margin: 0;
+          padding: 0;
+          height: 100vh;
+          min-height: 100vh;
+        }
+        `,
     },
   },
 });

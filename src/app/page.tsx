@@ -1,7 +1,11 @@
-import Image from "next/image";
+'use client'
+import TaskCard from "@/components/TaskCard.component";
 
 export default function Home() {
   return (
-    <div>Todo App</div>
+    <div className="flex justify-center items-center h-full">
+    <TaskCard />
+
+    </div>
   );
 }
