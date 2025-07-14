@@ -1,5 +1,5 @@
-import { Box, Chip, Paper } from "@mui/material"
-import { useState } from "react";
+import { Box, Chip, ClickAwayListener, Paper } from "@mui/material"
+import { useEffect, useState } from "react";
 import TaskCheck from "./card/TaskCheck";
 import TaskTitle from "./card/TaskTitle";
 import TaskButtons from "./card/TaskButtons";
@@ -8,20 +8,51 @@ import TaskDescription from "./card/TaskDescription";
 import TaskDates from "./card/TaskDates";
 import TaskPriority from "./card/TaskPriority";
 
-const task={
-    title: 'Design UI',
-    description: 'Finish login screen',
-    label: 'Work',
-    tags: ['UI', 'Figma'],
-    startDate: '2025-07-12',
-    endDate: '2025-07-15',
-    priority: 'High',
-    status: 'pending',
+type TaskCardProps = {
+    task: {
+        title: string;
+        description?: string;
+        label?: string;
+        tags?: string[];
+        startDate: Date | null;
+        endDate: Date | null;
+        priority?: string;
+        status: string;
+    },
+    handleUpdateTask: (updatedTask: any) => void,
 }
 
-const TaskCard = () => {
+const TaskCard = ({task, handleUpdateTask}: TaskCardProps) => {
     const [active, setActive] = useState(false);
+    const [isEditing, setIsEditing] = useState(true);
+    const [draftTask, setDraftTask] = useState(task);
+
+    useEffect(() => {
+        setDraftTask(task); // keep draft in sync with prop
+    }, [task]);
+
+    const handleFieldChange = (field: any, value: any) => {
+        setDraftTask(prev => ({ ...prev, [field]: value }));
+    }
+
+    const handleClickAway = () => {
+        // setDraftTask(task);
+        // setIsEditing(false);
+    }
+
+    const handleEdit = () => {
+        setIsEditing(true);
+    }
+
+    const handleDelete = () => {}
+
+    const handleSave = () => {
+        handleUpdateTask(draftTask);
+        setIsEditing(false);
+    }
+
   return (
+    <ClickAwayListener onClickAway={handleClickAway}>
     <Paper
         elevation={0}
         sx={{
@@ -34,40 +65,72 @@ const TaskCard = () => {
             justifyContent: 'space-between',
         }}
     >
-        <TaskCheck/>
+        <TaskCheck isEditing={isEditing}/>
         <Box sx={{my:'9px'}}
         flexGrow={1}
         onMouseEnter={() => setActive(true)}
         onMouseLeave={() => setActive(false)}
         >
             <Box sx={{display: 'flex', alignItems:'flex-start', justifyContent:'space-between'}}>
-                <TaskTitle title={task.title}/>
+                <TaskTitle 
+                    title={draftTask.title}
+                    isEditing={isEditing}
+                    onChange={(val) => handleFieldChange('title', val)}
+                />
                 
                 <Box 
-                    display="flex" 
-                    alignItems="center" justifyContent="flex-end" 
+                    display="flex"
                     sx={{
                         position: 'relative', mx:1
                     }}
                 >
-                        <TaskInfo active={active} status={task.status} label={task.label}/>
-                        <TaskButtons active={active}/>
+                        <TaskInfo 
+                            active={active} 
+                            isEditing={isEditing}
+                            status={draftTask.status} 
+                            label={draftTask.label}
+                            onStatusChange={(val) => handleFieldChange('status', val)}
+                            onLabelChange={(val) => handleFieldChange('label', val)}
+                        />
+                        <TaskButtons 
+                            active={active}
+                            isEditing={isEditing} 
+                            handleEdit={handleEdit} 
+                            handleDelete={handleDelete} 
+                            handleSave={handleSave}
+                        />
                 </Box>
             </Box>
             
-            <TaskDescription active={active} description={task.description}/>
+            <TaskDescription 
+                active={active}
+                isEditing={isEditing} 
+                description={draftTask.description}
+                onDescriptionChange={(val) => handleFieldChange('description', val)}
+            />
         
-            <Box sx={{display: 'flex', justifyContent:'space-between'}}>
-                <TaskDates startDate={task.startDate} dueDate={task.endDate}/>
-                <Box display="flex" gap={1} sx={{mx: 1}}>
-                    {task.tags.map((tag) => (
+            <Box sx={{display: 'flex', justifyContent:'space-between', alignContent: 'center'}}>
+                <TaskDates
+                    isEditing={isEditing}
+                    startDate={draftTask.startDate}
+                    dueDate={draftTask.endDate}
+                    onStartDateChange={(val) => handleFieldChange('startDate', val)}
+                    onDueDateChange={(val) => handleFieldChange('endDate', val)}
+                />
+                <Box display="flex" gap={1} sx={{mx: 1, alignItems: 'center'}}>
+                    {task.tags?.map((tag) => (
                         <Chip key={tag} label={`#${tag}`} size="small" />
                     ))}
-                    <TaskPriority priority={task.priority} />
+                    <TaskPriority
+                        isEditing={isEditing}
+                        priority={draftTask.priority}
+                        onPriorityChange={(val) => handleFieldChange('priority', val)} 
+                    />
                 </Box>
             </Box>
         </Box>
     </Paper>
+    </ClickAwayListener>
   )
 }
 

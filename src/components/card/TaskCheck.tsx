@@ -1,9 +1,9 @@
 import { Box, Checkbox } from "@mui/material"
 
-const TaskCheck = () => {
+const TaskCheck = ({isEditing}:{isEditing: boolean}) => {
   return (
     <Box>{/* It contains a checkbox, not hover-sensitive */}
-            <Checkbox/>
+            <Checkbox disabled={isEditing}/>
         </Box>
   )
 }
