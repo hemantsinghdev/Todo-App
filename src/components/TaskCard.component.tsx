@@ -1,5 +1,5 @@
-import { Box, Chip, ClickAwayListener, Paper } from "@mui/material"
-import { useEffect, useState } from "react";
+import { Box, Chip, Paper } from "@mui/material"
+import { useCallback, useEffect, useRef, useState } from "react";
 import TaskCheck from "./card/TaskCheck";
 import TaskTitle from "./card/TaskTitle";
 import TaskButtons from "./card/TaskButtons";
@@ -8,52 +8,85 @@ import TaskDescription from "./card/TaskDescription";
 import TaskDates from "./card/TaskDates";
 import TaskPriority from "./card/TaskPriority";
 
+type Task = {
+  title: string;
+  description?: string;
+  label?: string;
+  tags?: string[];
+  startDate: Date | null;
+  dueDate: Date | null;
+  priority?: string;
+  status: string;
+};
+
 type TaskCardProps = {
-    task: {
-        title: string;
-        description?: string;
-        label?: string;
-        tags?: string[];
-        startDate: Date | null;
-        endDate: Date | null;
-        priority?: string;
-        status: string;
-    },
-    handleUpdateTask: (updatedTask: any) => void,
-}
+  task: Task;
+  handleUpdateTask: (updatedTask: Task) => void;
+  handleDelete: () => {}
+};
 
-const TaskCard = ({task, handleUpdateTask}: TaskCardProps) => {
+const TaskCard = ({task, handleUpdateTask, handleDelete}: TaskCardProps) => {
     const [active, setActive] = useState(false);
-    const [isEditing, setIsEditing] = useState(true);
+    const [isEditing, setIsEditing] = useState(false);
     const [draftTask, setDraftTask] = useState(task);
+    const [showEmptyTitleError, setShowEmptyTitleError] = useState(false);
 
+    const wrapperRef = useRef<HTMLDivElement>(null);
     useEffect(() => {
-        setDraftTask(task); // keep draft in sync with prop
+      function handleClickOutside(event: MouseEvent) {
+        const target = event.target as HTMLElement;
+
+        if (wrapperRef.current && !wrapperRef.current.contains(target)) {
+          if (
+            document.querySelector('[role="presentation"]')?.contains(target) ||
+            target.closest('.MuiButtonBase-root') ||
+            target.closest('.MuiYearCalendar-button')
+          ) {
+            return;
+          }
+          setDraftTask(task);
+          setIsEditing(false);
+        }
+      }
+
+      document.addEventListener("mousedown", handleClickOutside);
+      return () => {
+        document.removeEventListener("mousedown", handleClickOutside);
+      };
     }, [task]);
 
-    const handleFieldChange = (field: any, value: any) => {
-        setDraftTask(prev => ({ ...prev, [field]: value }));
-    }
+    useEffect(() => {
+        setDraftTask(task);
+    }, [task]);
 
-    const handleClickAway = () => {
-        // setDraftTask(task);
-        // setIsEditing(false);
-    }
+    useEffect(() => {
+  if (!isEditing) {
+    setShowEmptyTitleError(false);
+  }
+}, [isEditing]);
 
-    const handleEdit = () => {
-        setIsEditing(true);
-    }
 
-    const handleDelete = () => {}
+    const handleFieldChange = useCallback(
+        <K extends keyof Task>(field: K, value: Task[K]) => {
+            setDraftTask(prev => ({ ...prev, [field]: value }))
+        }, [])
 
     const handleSave = () => {
-        handleUpdateTask(draftTask);
+        if (!draftTask.title.trim()) {
+            setShowEmptyTitleError(true);
+            const fixedTask = {...draftTask, title: task.title};
+            handleUpdateTask(fixedTask);
+        }else{
+            setShowEmptyTitleError(false);
+            handleUpdateTask(draftTask);
+        }
         setIsEditing(false);
+        setActive(false);
     }
 
   return (
-    <ClickAwayListener onClickAway={handleClickAway}>
     <Paper
+        ref = {wrapperRef}
         elevation={0}
         sx={{
             width: 600,
@@ -65,8 +98,13 @@ const TaskCard = ({task, handleUpdateTask}: TaskCardProps) => {
             justifyContent: 'space-between',
         }}
     >
-        <TaskCheck isEditing={isEditing}/>
-        <Box sx={{my:'9px'}}
+        <TaskCheck
+            isEditing={isEditing}
+            status={draftTask.status}
+            onStatusChange={(v) => handleFieldChange('status', v)}
+        />
+
+        <Box sx={{my:'9px', mx: '5px'}}
         flexGrow={1}
         onMouseEnter={() => setActive(true)}
         onMouseLeave={() => setActive(false)}
@@ -76,6 +114,7 @@ const TaskCard = ({task, handleUpdateTask}: TaskCardProps) => {
                     title={draftTask.title}
                     isEditing={isEditing}
                     onChange={(val) => handleFieldChange('title', val)}
+                    showEmptyError={showEmptyTitleError}
                 />
                 
                 <Box 
@@ -95,7 +134,7 @@ const TaskCard = ({task, handleUpdateTask}: TaskCardProps) => {
                         <TaskButtons 
                             active={active}
                             isEditing={isEditing} 
-                            handleEdit={handleEdit} 
+                            handleEdit={() => setIsEditing(true)} 
                             handleDelete={handleDelete} 
                             handleSave={handleSave}
                         />
@@ -109,18 +148,27 @@ const TaskCard = ({task, handleUpdateTask}: TaskCardProps) => {
                 onDescriptionChange={(val) => handleFieldChange('description', val)}
             />
         
-            <Box sx={{display: 'flex', justifyContent:'space-between', alignContent: 'center'}}>
+            <Box 
+                sx={{
+                    display: 'flex',
+                    justifyContent:'space-between', 
+                    alignContent: 'center',
+                    marginTop: (draftTask.startDate || draftTask.dueDate || draftTask.tags || draftTask.priority) ? 2 : 0,
+                }}
+            >
                 <TaskDates
                     isEditing={isEditing}
                     startDate={draftTask.startDate}
-                    dueDate={draftTask.endDate}
+                    dueDate={draftTask.dueDate}
                     onStartDateChange={(val) => handleFieldChange('startDate', val)}
-                    onDueDateChange={(val) => handleFieldChange('endDate', val)}
+                    onDueDateChange={(val) => handleFieldChange('dueDate', val)}
                 />
                 <Box display="flex" gap={1} sx={{mx: 1, alignItems: 'center'}}>
-                    {task.tags?.map((tag) => (
+                    <Box display="flex" gap={0.5} sx={{mt:'-2px'}}>
+                    {!isEditing && draftTask.tags?.slice(0, 4).map((tag) => (
                         <Chip key={tag} label={`#${tag}`} size="small" />
                     ))}
+                    </Box>
                     <TaskPriority
                         isEditing={isEditing}
                         priority={draftTask.priority}
@@ -130,7 +178,6 @@ const TaskCard = ({task, handleUpdateTask}: TaskCardProps) => {
             </Box>
         </Box>
     </Paper>
-    </ClickAwayListener>
   )
 }
 

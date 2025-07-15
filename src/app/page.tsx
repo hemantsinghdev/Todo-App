@@ -6,12 +6,12 @@ const date: Date = new Date();
 
 const task={
     title: 'Design UI',
-    description: 'Finish \n login \n screen',
-    label: 'Work',
-    tags: ['UI', 'Figma'],
-    startDate: date,
-    endDate: null,
-    priority: 'High',
+    // description: 'Finish \n login \n screen',
+    // label: 'Work',
+    // tags: ['UI', 'Figma'],
+    startDate: null,
+    dueDate: null,
+    // priority: 'High',
     status: 'Pending',
 }
 
@@ -19,13 +19,17 @@ export default function Home() {
   const [newTask, setNewTask] = useState(task);
 
   const handleUpdateTask = (updatedTask: any) => {
-      console.log("\n\nNew Task received : ", updatedTask)
       setNewTask(updatedTask);
+  };
+
+  const onDelete = () => {
+    console.log("Item is deleted");
+    return '';
   };
 
   return (
     <div className="flex justify-center items-center h-full">
-    <TaskCard task={newTask} handleUpdateTask={handleUpdateTask}/>
+    <TaskCard task={newTask} handleUpdateTask={handleUpdateTask} handleDelete={onDelete}/>
 
     </div>
   );

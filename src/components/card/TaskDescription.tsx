@@ -27,6 +27,10 @@ const TaskDescription = ({
     }
   }, [active, description, isEditing]);
 
+  const shouldRender = isEditing || !!description;
+
+  if (!shouldRender) return null;
+
   return (
     <Box
       sx={{
@@ -35,7 +39,7 @@ const TaskDescription = ({
         transition: 'height 0.4s ease, opacity 0.4s ease',
         opacity: active || isEditing ? 1 : 0,
         pointerEvents: active || isEditing ? 'auto' : 'none',
-        my: 1,
+        my: 2,
       }}
     >
       <Box ref={contentRef}>
@@ -46,14 +50,16 @@ const TaskDescription = ({
             value={description}
             onChange={(e) => onDescriptionChange(e.target.value)}
             variant="outlined"
-            placeholder='Add the Description for the Task here...'
-            minRows={2}
+            placeholder="Add the Description for the Task here..."
+            minRows={3}
             sx={{
+              backgroundColor: '#f4edfa', // #f5f0fa
               '& .MuiOutlinedInput-root': {
                 fontSize: '0.9rem',
                 fontWeight: 300,
                 lineHeight: 1.6,
                 borderRadius: 1,
+                padding: '4px 8px',
               },
               '& .MuiOutlinedInput-notchedOutline': {
                 borderColor: '#ddd',
@@ -62,13 +68,9 @@ const TaskDescription = ({
                 borderColor: '#bbb',
               },
             }}
-            slotProps={{
-              input: {
-                style: {
-                  padding: '0 5px',
-                  margin: 0,
-                  whiteSpace: 'pre-wrap',
-                },
+            inputProps={{
+              style: {
+                whiteSpace: 'pre-wrap',
               },
             }}
           />
@@ -79,6 +81,7 @@ const TaskDescription = ({
               fontWeight: 300,
               whiteSpace: 'pre-line',
               lineHeight: 1.6,
+              color: '#444',
             }}
           >
             {description}
