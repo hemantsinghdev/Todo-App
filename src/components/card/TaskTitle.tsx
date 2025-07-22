@@ -30,6 +30,11 @@ const TaskTitle = ({ title, isEditing, onChange, showEmptyError = false }: TaskT
           onChange={(e) => onChange(e.target.value)}
           placeholder="Enter task title"
           fullWidth
+          slotProps={{
+              htmlInput:{
+                maxLength: 400,
+              }
+            }}
           sx={{
             '& .MuiInputBase-input': {
               height: 25,

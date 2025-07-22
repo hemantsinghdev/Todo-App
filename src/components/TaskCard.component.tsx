@@ -1,27 +1,19 @@
 import { Box, Chip, Paper } from "@mui/material"
 import { useCallback, useEffect, useRef, useState } from "react";
-import TaskCheck from "./card/TaskCheck";
-import TaskTitle from "./card/TaskTitle";
-import TaskButtons from "./card/TaskButtons";
-import TaskInfo from "./card/TaskInfo";
-import TaskDescription from "./card/TaskDescription";
-import TaskDates from "./card/TaskDates";
-import TaskPriority from "./card/TaskPriority";
-
-type Task = {
-  title: string;
-  description?: string;
-  label?: string;
-  tags?: string[];
-  startDate: Date | null;
-  dueDate: Date | null;
-  priority?: string;
-  status: string;
-};
+import {
+    TaskCheck,
+    TaskTitle,
+    TaskInfo,
+    TaskButtons,
+    TaskDescription,
+    TaskDates,
+    TaskPriority,
+} from './card';
+import TTask from "@/types/task";
 
 type TaskCardProps = {
-  task: Task;
-  handleUpdateTask: (updatedTask: Task) => void;
+  task: TTask;
+  handleUpdateTask: (updatedTask: TTask) => void;
   handleDelete: () => {}
 };
 
@@ -48,7 +40,6 @@ const TaskCard = ({task, handleUpdateTask, handleDelete}: TaskCardProps) => {
           setIsEditing(false);
         }
       }
-
       document.addEventListener("mousedown", handleClickOutside);
       return () => {
         document.removeEventListener("mousedown", handleClickOutside);
@@ -60,14 +51,14 @@ const TaskCard = ({task, handleUpdateTask, handleDelete}: TaskCardProps) => {
     }, [task]);
 
     useEffect(() => {
-  if (!isEditing) {
-    setShowEmptyTitleError(false);
-  }
-}, [isEditing]);
+      if (!isEditing) {
+        setShowEmptyTitleError(false);
+      }
+    }, [isEditing]);
 
 
     const handleFieldChange = useCallback(
-        <K extends keyof Task>(field: K, value: Task[K]) => {
+        <K extends keyof TTask>(field: K, value: TTask[K]) => {
             setDraftTask(prev => ({ ...prev, [field]: value }))
         }, [])
 
@@ -101,7 +92,7 @@ const TaskCard = ({task, handleUpdateTask, handleDelete}: TaskCardProps) => {
         <TaskCheck
             isEditing={isEditing}
             status={draftTask.status}
-            onStatusChange={(v) => handleFieldChange('status', v)}
+            onChange={(v) => handleFieldChange('status', v)}
         />
 
         <Box sx={{my:'9px', mx: '5px'}}

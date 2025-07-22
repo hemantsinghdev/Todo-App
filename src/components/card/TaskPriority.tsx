@@ -1,9 +1,9 @@
 import { Box, MenuItem, Select, Typography } from '@mui/material';
 
 type TaskPriorityProps = {
-  priority?: string;
+  priority?: "low" | "medium" | "high";
   isEditing: boolean;
-  onPriorityChange: (priority: string) => void;
+  onPriorityChange: (priority: ("low" | "medium" | "high")) => void;
 };
 
 const priorityColors: Record<string, string> = {
@@ -12,7 +12,7 @@ const priorityColors: Record<string, string> = {
   low: '#43a047',
 };
 
-const priorities = ['High', 'Medium', 'Low'];
+const priorities = ['high', 'medium', 'low'];
 
 const TaskPriority = ({ priority, isEditing, onPriorityChange }: TaskPriorityProps) => {
   const color = priority ? priorityColors[priority.toLowerCase()] : 'gray';
@@ -35,6 +35,7 @@ const TaskPriority = ({ priority, isEditing, onPriorityChange }: TaskPriorityPro
             px: 1,
             height: 28,
             borderRadius: 1,
+            textTransform:"capitalize",
             bgcolor: 'transparent',
             '& .MuiSelect-select': {
               padding: '4px 0',
@@ -61,7 +62,7 @@ const TaskPriority = ({ priority, isEditing, onPriorityChange }: TaskPriorityPro
             return (
               <Box display="flex" alignItems="center" gap={0.5}>
                 <Typography sx={{ color, marginTop: '-4px' }}>●</Typography>
-                <Typography sx={{ color, fontSize: '0.9rem' }}>
+                <Typography sx={{ color, fontSize: '0.9rem', textTransform: 'capitalize' }}>
                   {selected}
                 </Typography>
               </Box>
@@ -84,6 +85,7 @@ const TaskPriority = ({ priority, isEditing, onPriorityChange }: TaskPriorityPro
                 sx={{
                   fontWeight: 500,
                   color: priorityColors[option.toLowerCase()],
+                  textTransform: 'capitalize'
                 }}
               >
                 {option}

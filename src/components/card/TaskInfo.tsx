@@ -12,18 +12,15 @@ import {
   Button,
 } from '@mui/material';
 import React, { useCallback, useState } from 'react';
-
-type LabelOption = {
-  title: string;
-  color: string;
-};
+import TLabel from "@/types/label";
+import truncateLabel from '@/helpers/truncateLabel';
 
 type TaskInfoProps = {
   active: boolean;
   isEditing: boolean;
-  status: string;
+  status: "pending" | "in progress" | "completed";
   label?: string;
-  onStatusChange: (newStatus: string) => void;
+  onStatusChange: (newStatus: "pending" | "in progress") => void;
   onLabelChange: (newLabel: string) => void;
 };
 
@@ -35,6 +32,7 @@ const TaskInfo = ({
   onStatusChange,
   onLabelChange,
 }: TaskInfoProps) => {
+  
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
       case 'pending':
@@ -46,54 +44,37 @@ const TaskInfo = ({
     }
   };
 
-  const [labelOptions, setLabelOptions] = useState<LabelOption[]>([
-    { title: 'Work', color: 'red' },
-    { title: 'Coding', color: 'blue' },
+  const getCompactLabel = useCallback(truncateLabel, [])
+
+  const [labelOptions, setLabelOptions] = useState<TLabel[]>([
+    { labelName: 'Work', color: 'red' },
+    { labelName: 'Coding', color: 'blue' },
   ]);
 
-  const currentLabel = labelOptions.find((l) => l.title === label);
+  const currentLabel = labelOptions.find((l) => l.labelName === label);
   const labelColor = currentLabel?.color ?? 'gray';
 
   const [openAddDialog, setOpenAddDialog] = useState(false);
   const [newLabelTitle, setNewLabelTitle] = useState('');
   const [newLabelColor, setNewLabelColor] = useState('#6b3d8f');
 
-  const statusOptions = ['Pending', 'In Progress'];
+  const statusOptions = ['pending', 'in progress'];
 
   const handleAddNewLabel = () => {
     const trimmedTitle = newLabelTitle.trim();
     if (!trimmedTitle) return;
 
-    const newLabel: LabelOption = {
-      title: trimmedTitle,
+    const newLabel: TLabel = {
+      labelName: trimmedTitle,
       color: newLabelColor,
     };
 
     setLabelOptions((prev) => [...prev, newLabel]);
-    onLabelChange(newLabel.title);
+    onLabelChange(newLabel.labelName);
     setNewLabelTitle('');
     setNewLabelColor('#6b3d8f');
     setOpenAddDialog(false);
   };
-
-  const getCompactLabel = useCallback((label: string) => {
-    const maxLength = 12;
-    if (!label) return '';
-
-    const truncate = (str: string, max: number) =>
-    str.length > max ? str.slice(0, max - 1) + '…' : str;
-
-    const words = label.split(' ');
-    if (words.length === 1) return truncate(words[0], maxLength);
-
-    const first = words[0];
-    const second = words[1];
-
-    const combined = `${first} ${second}`;
-    if (combined.length <= maxLength) return combined;
-
-    return truncate(first, maxLength);
-  }, [])
 
   return (
     <>
@@ -110,7 +91,7 @@ const TaskInfo = ({
             <Select
               size="small"
               value={status}
-              onChange={(e) => onStatusChange(e.target.value)}
+              onChange={(e) => onStatusChange(e.target.value as ("pending" | "in progress"))}
               variant="outlined"
               sx={{
                 height: 25,
@@ -121,6 +102,20 @@ const TaskInfo = ({
                 '.MuiOutlinedInput-notchedOutline': {
                   borderRadius: 1,
                 },
+              }}
+              renderValue={(value) => {
+                return (
+                  <Typography
+                    sx={{
+                      fontWeight: 600,
+                      fontSize: label ? '14px' : '16px',
+                      color: getStatusColor(status),
+                      textTransform: 'capitalize',
+                    }}
+                  >
+                    {value}
+                  </Typography>
+                )
               }}
             >
               {statusOptions.map((option) => (
@@ -183,10 +178,17 @@ const TaskInfo = ({
                     boxShadow: 3,
                     overflow: 'auto',
                     maxHeight: 168,
-                    scrollbarWidth: 'none',
                     '&::-webkit-scrollbar': {
-                      display: 'none',
+                      // display: 'none',
+                      width: "4px",
                     },
+                    '&::-webkit-scrollbar-thumb':{
+                      backgroundColor: "#A60000",
+                      borderRadius: "4px"
+                    },
+                    '&::-webkit-scrollbar-thumb:hover':{
+                      backgroundColor: "#8B0404",
+                    }
                   },
                 },
                 MenuListProps: {
@@ -205,7 +207,7 @@ const TaskInfo = ({
                 },
               }}
               renderValue={(selected) => {
-                const selectedLabel = labelOptions.find((l) => l.title === selected);
+                const selectedLabel = labelOptions.find((l) => l.labelName === selected);
                 if (!selectedLabel) {
                   return (
                     <Chip
@@ -223,7 +225,7 @@ const TaskInfo = ({
                 }
                 return (
                   <Chip
-                    label={getCompactLabel(selectedLabel.title)}
+                    label={getCompactLabel(selectedLabel.labelName)}
                     sx={{
                       bgcolor: selectedLabel.color,
                       color: 'white',
@@ -237,9 +239,9 @@ const TaskInfo = ({
               }}
             >
               {labelOptions.map((option) => (
-                <MenuItem key={option.title} value={option.title}>
+                <MenuItem key={option.labelName} value={option.labelName}>
                   <Typography sx={{ fontWeight: 500, fontSize: 14, color: option.color }}>
-                    {option.title}
+                    {option.labelName}
                   </Typography>
                 </MenuItem>
               ))}

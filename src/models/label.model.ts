@@ -1,13 +1,11 @@
 import { Schema, Document, Model, models, model } from "mongoose";
+import TLabel from "@/types/label";
 
-interface ILabel extends Document {
-  name: string;
-  color: string;
-}
+interface ILabel extends TLabel, Document {}
 
 const LabelSchema = new Schema<ILabel>(
   {
-    name: {
+    labelName: {
       type: String,
       required: true,
       trim: true,

@@ -13,6 +13,7 @@ const task={
     dueDate: null,
     // priority: 'High',
     status: 'Pending',
+    synced: false,
 }
 
 export default function Home() {

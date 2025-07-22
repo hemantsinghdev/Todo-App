@@ -17,10 +17,13 @@
     "@mui/material-nextjs": "^7.2.0",
     "@mui/x-date-pickers": "^8.8.0",
     "date-fns": "^4.1.0",
+    "dexie": "^4.0.11",
     "mongoose": "^8.16.1",
     "next": "15.3.5",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "uuid": "^11.1.0",
+    "zustand": "^5.0.6"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
