@@ -19,7 +19,7 @@ type TaskInfoProps = {
   active: boolean;
   isEditing: boolean;
   status: "pending" | "in progress" | "completed";
-  label?: string;
+  labelId?: string;
   onStatusChange: (newStatus: "pending" | "in progress") => void;
   onLabelChange: (newLabel: string) => void;
 };
@@ -28,7 +28,7 @@ const TaskInfo = ({
   active,
   isEditing,
   status,
-  label,
+  labelId,
   onStatusChange,
   onLabelChange,
 }: TaskInfoProps) => {
@@ -47,11 +47,11 @@ const TaskInfo = ({
   const getCompactLabel = useCallback(truncateLabel, [])
 
   const [labelOptions, setLabelOptions] = useState<TLabel[]>([
-    { labelName: 'Work', color: 'red' },
-    { labelName: 'Coding', color: 'blue' },
+    { labelId: "red-label", labelName: 'Work', color: 'red' },
+    { labelId: "blue-label", labelName: 'Coding', color: 'blue' },
   ]);
 
-  const currentLabel = labelOptions.find((l) => l.labelName === label);
+  const currentLabel = labelOptions.find((l) => l.labelId === labelId);
   const labelColor = currentLabel?.color ?? 'gray';
 
   const [openAddDialog, setOpenAddDialog] = useState(false);
@@ -65,6 +65,7 @@ const TaskInfo = ({
     if (!trimmedTitle) return;
 
     const newLabel: TLabel = {
+      labelId: `${newLabelColor}-label`,
       labelName: trimmedTitle,
       color: newLabelColor,
     };
@@ -78,13 +79,13 @@ const TaskInfo = ({
 
   return (
     <>
-      <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: label || isEditing ? 1 : 0 }}>
+      <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: labelId || isEditing ? 1 : 0 }}>
         {/* Status */}
         <Box
           sx={{
             transition: 'transform 0.5s ease',
             transform: active || isEditing ? 'translateX(-75px)' : 'translateX(0)',
-            margin: isEditing || !label ? 0 : '3px',
+            margin: isEditing || !labelId ? 0 : '3px',
           }}
         >
           {isEditing ? (
@@ -108,7 +109,7 @@ const TaskInfo = ({
                   <Typography
                     sx={{
                       fontWeight: 600,
-                      fontSize: label ? '14px' : '16px',
+                      fontSize: labelId ? '14px' : '16px',
                       color: getStatusColor(status),
                       textTransform: 'capitalize',
                     }}
@@ -137,7 +138,7 @@ const TaskInfo = ({
             <Typography
               sx={{
                 fontWeight: 600,
-                fontSize: label ? '14px' : '16px',
+                fontSize: labelId ? '14px' : '16px',
                 color: getStatusColor(status),
                 textTransform: 'capitalize',
               }}
@@ -157,7 +158,7 @@ const TaskInfo = ({
           {isEditing ? (
             <Select
               size="small"
-              value={label || ''}
+              value={labelId || ''}
               onChange={(e) => {
                 if (e.target.value === '__add_label__') {
                   setOpenAddDialog(true);
@@ -207,7 +208,7 @@ const TaskInfo = ({
                 },
               }}
               renderValue={(selected) => {
-                const selectedLabel = labelOptions.find((l) => l.labelName === selected);
+                const selectedLabel = labelOptions.find((l) => l.labelId === selected);
                 if (!selectedLabel) {
                   return (
                     <Chip
@@ -239,7 +240,7 @@ const TaskInfo = ({
               }}
             >
               {labelOptions.map((option) => (
-                <MenuItem key={option.labelName} value={option.labelName}>
+                <MenuItem key={option.labelId} value={option.labelName}>
                   <Typography sx={{ fontWeight: 500, fontSize: 14, color: option.color }}>
                     {option.labelName}
                   </Typography>
@@ -263,9 +264,9 @@ const TaskInfo = ({
               </MenuItem>
             </Select>
           ) : (
-            label && (
+            currentLabel && (
               <Chip
-                label={getCompactLabel(label)}
+                label={getCompactLabel(currentLabel.labelName)}
                 sx={{
                   bgcolor: labelColor,
                   color: 'white',

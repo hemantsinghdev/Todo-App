@@ -2,7 +2,7 @@ type TTask = {
   localId: string;
   title: string;
   description?: string;
-  label?: string;
+  labelId?: string;
   tags?: string[];
   startDate: Date | null;
   dueDate: Date | null;

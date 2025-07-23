@@ -5,6 +5,11 @@ interface ILabel extends TLabel, Document {}
 
 const LabelSchema = new Schema<ILabel>(
   {
+    labelId: {
+      type: String,
+      required: true,
+      trim: true,
+    },
     labelName: {
       type: String,
       required: true,
@@ -18,7 +23,7 @@ const LabelSchema = new Schema<ILabel>(
     },
   },
   {
-    timestamps: true,
+    collection: "labels",
   }
 );
 

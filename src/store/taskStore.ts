@@ -1,10 +1,10 @@
 import { create } from "zustand";
 import { v4 as uuidv4 } from "uuid";
 import TTask from "@/types/task";
-import { addTaskToDB, updateTaskInDB } from "@/db/helpers";
+import { addTaskToDB, updateTaskInDB } from "@/services/indexedDB/taskServices";
 
 type FilterOptions = {
-  label?: string;
+  labelId?: string;
   day?: "today" | "upcoming" | "expired";
 };
 
@@ -39,7 +39,7 @@ const useTaskStore = create<TaskState>((set, get) => ({
     const task: TTask = {
       localId: uuidv4(),
       title: `untitled_${nextNumber}`,
-      label: "unlabeled",
+      labelId: "unlabeled",
       description: "",
       tags: [],
       startDate: null,
@@ -79,8 +79,8 @@ const useTaskStore = create<TaskState>((set, get) => ({
 
     let filtered = [...tasks];
 
-    if (filter?.label) {
-      filtered = filtered.filter((t) => t.label === filter.label);
+    if (filter?.labelId) {
+      filtered = filtered.filter((t) => t.labelId === filter.labelId);
     }
 
     if (filter?.day) {

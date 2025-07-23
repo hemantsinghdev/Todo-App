@@ -118,9 +118,9 @@ const TaskCard = ({task, handleUpdateTask, handleDelete}: TaskCardProps) => {
                             active={active} 
                             isEditing={isEditing}
                             status={draftTask.status} 
-                            label={draftTask.label}
+                            labelId={draftTask.labelId}
                             onStatusChange={(val) => handleFieldChange('status', val)}
-                            onLabelChange={(val) => handleFieldChange('label', val)}
+                            onLabelChange={(val) => handleFieldChange('labelId', val)}
                         />
                         <TaskButtons 
                             active={active}
