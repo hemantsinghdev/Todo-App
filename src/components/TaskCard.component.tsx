@@ -14,7 +14,7 @@ import TTask from "@/types/task";
 type TaskCardProps = {
   task: TTask;
   handleUpdateTask: (updatedTask: TTask) => void;
-  handleDelete: () => {}
+  handleDelete: () => void;
 };
 
 const TaskCard = ({task, handleUpdateTask, handleDelete}: TaskCardProps) => {
