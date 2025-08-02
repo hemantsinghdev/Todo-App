@@ -30,8 +30,16 @@ const mockTasks: TTask[] = [
   },
 ];
 
-const TaskBoard = () => {
-    const handleUpdateTask = (updatedTask: TTask) => {
+type TaskBoardProps = {
+  tasksByLabel: {
+    [labelName: string]: TTask[];
+  };
+};
+
+const TaskBoard = ({ tasksByLabel }: TaskBoardProps) => {
+  const hasTasks = Object.values(tasksByLabel).some(arr => arr.length > 0);
+
+  const handleUpdateTask = (updatedTask: TTask) => {
     console.log('Task updated:', updatedTask);
   };
 
@@ -39,13 +47,25 @@ const TaskBoard = () => {
     console.log('Delete task:', taskId);
   };
 
+  if (!hasTasks) {
+    return (
+      <div className="text-center text-gray-500 mt-10">
+        No tasks found. Start by adding a task.
+      </div>
+    );
+  }
+
   return (
-    <TaskContainer
-      label="Work"
-      tasks={mockTasks}
-      handleUpdateTask={handleUpdateTask}
-      handleDeleteTask={handleDeleteTask}
-    />
+    <div className="flex gap-4 px-4 overflow-x-auto">
+      {Object.entries(tasksByLabel).map(([label, tasks]) => (
+        <TaskContainer
+          label={label || "unlabeled"}
+          tasks={tasks}
+          handleUpdateTask={handleUpdateTask}
+          handleDeleteTask={handleDeleteTask}
+        />
+      ))}
+    </div>
   );
 }
 

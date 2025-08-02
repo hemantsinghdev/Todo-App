@@ -1,11 +1,16 @@
-import TaskBoard from "@/components/TaskBoard.component";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
+import BootstrapApp from "@/components/BootstrapApp";
+import { getAllTasks } from "@/services/mongoDB/taskServices";
 
-export default function Home() {
-  
-  return (
-    <div className="flex justify-center items-center h-full">
-    <TaskBoard/>
+export default async function Page() {
+  const cookieStore = await cookies();
+  const isSynced = cookieStore.get("isSynced");
 
-    </div>
-  );
+  if (isSynced) {
+    redirect("/tasks");
+  }
+
+  const tasks = await getAllTasks();
+  return <BootstrapApp tasks={tasks} />;
 }

@@ -1,9 +1,20 @@
 'use client';
-import { Drawer, Toolbar, Box, List, ListItemText, ListItemButton } from '@mui/material';
+
+import { Drawer, Toolbar, Box, Button, Divider } from '@mui/material';
+import useTaskStore from '@/store/taskStore';
+import { createNewTask } from '@/helpers/createNewTask';
+import { addTaskToDB } from '@/services/indexedDB/taskServices';
+
 const drawerWidth = 240;
 
 const Sidebar = () => {
-  const labels = ['Work', 'Personal', 'Shopping', 'Ideas'];
+  const addTask = useTaskStore(state => state.addTask);
+
+  const handleAddTask = async () => {
+    const newTask = createNewTask();
+    addTask(newTask);
+    await addTaskToDB(newTask);
+  };
 
   return (
     <Drawer
@@ -18,14 +29,17 @@ const Sidebar = () => {
       }}
     >
       <Toolbar />
-      <Box sx={{ overflow: 'auto' }}>
-        <List>
-          {labels.map((text) => (
-            <ListItemButton key={text}>
-              <ListItemText primary={text} />
-            </ListItemButton>
-          ))}
-        </List>
+      <Box sx={{ p: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={handleAddTask}
+          fullWidth
+        >
+          ➕ Add Task
+        </Button>
+
+        <Divider />
       </Box>
     </Drawer>
   );

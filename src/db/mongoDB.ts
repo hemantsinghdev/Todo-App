@@ -19,6 +19,7 @@ export async function connectToDB() {
 
   if (!cached.promise) {
     cached.promise = mongoose.connect(MONGODB_URI, {
+      dbName: "todo_app",
       bufferCommands: false,
     });
   }

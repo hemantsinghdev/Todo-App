@@ -7,13 +7,17 @@ export async function initializeDB(tasks: TTask[]) {
 }
 
 export async function addTaskToDB(task: TTask): Promise<void> {
-  await taskDB.tasks.put(task);
+  try {
+    await taskDB.tasks.add(task);
+  } catch (error) {
+    console.error("Failed to add task to IndexedDB:", error);
+  }
 }
 
 export async function updateTaskInDB(task: TTask): Promise<void> {
   await taskDB.tasks.put(task);
 }
 
-export async function getTasksFromDB(): Promise<TTask[]> {
+export async function getAllTasks(): Promise<TTask[]> {
   return await taskDB.tasks.toArray();
 }
