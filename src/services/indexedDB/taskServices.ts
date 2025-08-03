@@ -14,6 +14,14 @@ export async function addTaskToDB(task: TTask): Promise<void> {
   }
 }
 
+export async function deleteTaskfromDB(taskLocalId: string): Promise<void> {
+  try {
+    await taskDB.tasks.delete(taskLocalId);
+  } catch (error) {
+    console.error("Failed to remove task from IndexedDB:", error);
+  }
+}
+
 export async function updateTaskInDB(task: TTask): Promise<void> {
   await taskDB.tasks.put(task);
 }

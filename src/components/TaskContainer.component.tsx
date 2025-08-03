@@ -20,12 +20,13 @@ export default function TaskContainer({
     <Box
       component="fieldset"
       sx={{
-        border: '2px solid #000',
+        border: '1px solid #000',
         borderRadius: 2,
         p: 2,
         mb: 6,
         position: 'relative',
         pl: 2,
+        width: 64,
       }}
     >
       <Box
@@ -35,6 +36,7 @@ export default function TaskContainer({
           fontWeight: 600,
           fontSize: '1rem',
           fontFamily: 'Comic Sans MS, cursive',
+          textTransform: 'capitalize',
         }}
       >
         {label}
@@ -45,8 +47,8 @@ export default function TaskContainer({
           <TaskCard
             key={task.localId}
             task={task}
-            handleUpdateTask={(updatedTask) => handleUpdateTask(updatedTask)}
-            handleDelete={() => handleDeleteTask(task.localId)}
+            handleUpdateTask={handleUpdateTask}
+            handleDelete={handleDeleteTask}
           />
         ))}
       </Stack>

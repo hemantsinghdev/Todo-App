@@ -21,13 +21,12 @@ export default function RootLayout({
         <AppRouterCacheProvider>
           <ThemeRegistry>
             <CssBaseline />
-            <Box sx={{ display: 'flex' }}>
+            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
               <Sidebar />
               <Box
                 component="main"
-                sx={{ flexGrow: 1, bgcolor: 'background.default', p: 3 }}
+                sx={{ml: '240px'}}
               >
-                <Toolbar /> {/* Maintain spacing below AppBar or Drawer */}
                 {children}
               </Box>
             </Box>

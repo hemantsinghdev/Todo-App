@@ -6,7 +6,7 @@ type TaskButtonsProps = {
   active: boolean;
   isEditing: boolean;
   handleEdit: () => void;
-  handleDelete: () => void;
+  deleteTask: () => void;
   handleSave: () => void;
 };
 
@@ -20,7 +20,7 @@ const TaskButtons = ({
   active,
   isEditing,
   handleEdit,
-  handleDelete,
+  deleteTask,
   handleSave,
 }: TaskButtonsProps) => {
   const [openConfirmDialog, setOpenConfirmDialog] = useState(false);
@@ -31,7 +31,7 @@ const TaskButtons = ({
 
   const onConfirmDelete = () => {
     setOpenConfirmDialog(false);
-    handleDelete();
+    deleteTask();
   };
 
   const onCancelDelete = () => {

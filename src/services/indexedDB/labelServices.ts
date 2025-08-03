@@ -6,6 +6,22 @@ export async function initializeDB(labels: TLabel[]) {
   await labelDB.labels.bulkPut(labels);
 }
 
-export async function addTaskToDB(label: TLabel): Promise<void> {
-  await labelDB.labels.put(label);
+export async function addLabelToDB(label: TLabel): Promise<void> {
+  try {
+    await labelDB.labels.add(label);
+  } catch (error) {
+    console.error("Failed to add task to IndexedDB:", error);
+  }
+}
+
+export async function deleteLabelfromDB(labelLocalId: string): Promise<void> {
+  try {
+    await labelDB.labels.delete(labelLocalId);
+  } catch (error) {
+    console.error("Failed to remove task from IndexedDB:", error);
+  }
+}
+
+export async function getAllLabels(): Promise<TLabel[]> {
+  return await labelDB.labels.toArray();
 }

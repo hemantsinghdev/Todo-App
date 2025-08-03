@@ -14,7 +14,7 @@ import TTask from "@/types/task";
 type TaskCardProps = {
   task: TTask;
   handleUpdateTask: (updatedTask: TTask) => void;
-  handleDelete: () => void;
+  handleDelete: (taskLocalId: string) => void;
 };
 
 const TaskCard = ({task, handleUpdateTask, handleDelete}: TaskCardProps) => {
@@ -75,6 +75,10 @@ const TaskCard = ({task, handleUpdateTask, handleDelete}: TaskCardProps) => {
         setActive(false);
     }
 
+    const deleteTask = () => {
+        handleDelete(task.localId);
+    }
+
   return (
     <Paper
         ref = {wrapperRef}
@@ -126,7 +130,7 @@ const TaskCard = ({task, handleUpdateTask, handleDelete}: TaskCardProps) => {
                             active={active}
                             isEditing={isEditing} 
                             handleEdit={() => setIsEditing(true)} 
-                            handleDelete={handleDelete} 
+                            deleteTask={deleteTask} 
                             handleSave={handleSave}
                         />
                 </Box>

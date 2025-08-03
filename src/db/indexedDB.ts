@@ -19,7 +19,7 @@ class LabelDatabase extends Dexie {
   constructor() {
     super("LabelDB");
     this.version(1).stores({
-      labels: "labelId",
+      labels: "localId",
     });
   }
 }

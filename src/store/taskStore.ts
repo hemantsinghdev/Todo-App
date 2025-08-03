@@ -1,7 +1,11 @@
 import { create } from "zustand";
-import { v4 as uuidv4 } from "uuid";
 import TTask from "@/types/task";
-import { addTaskToDB, updateTaskInDB } from "@/services/indexedDB/taskServices";
+import {
+  addTaskToDB,
+  deleteTaskfromDB,
+  updateTaskInDB,
+} from "@/services/indexedDB/taskServices";
+import { createNewTask } from "@/helpers/createNewTask";
 
 type FilterOptions = {
   labelId?: string;
@@ -12,8 +16,8 @@ type TaskState = {
   tasks: TTask[];
   setTasks: (tasks: TTask[]) => void;
   newTask: () => void;
-  addTask: (task: TTask) => void;
   updateTask: (task: TTask) => void;
+  deleteTask: (taskLocalId: string) => void;
   getTasks: (filter?: FilterOptions) => TTask[];
 };
 
@@ -25,7 +29,6 @@ const useTaskStore = create<TaskState>((set, get) => ({
   newTask: () => {
     const tasks = get().tasks;
 
-    // Get next untitled number
     const untitledCount = tasks
       .filter((t) => t.title.startsWith("untitled_"))
       .map((t) => {
@@ -36,30 +39,9 @@ const useTaskStore = create<TaskState>((set, get) => ({
     const nextNumber =
       untitledCount.length > 0 ? Math.max(...untitledCount) + 1 : 1;
 
-    const task: TTask = {
-      localId: uuidv4(),
-      title: `untitled_${nextNumber}`,
-      labelId: "unlabeled",
-      description: "",
-      tags: [],
-      startDate: null,
-      dueDate: null,
-      priority: "low",
-      status: "pending",
-      synced: false,
-    };
+    const task: TTask = createNewTask(`untitled_${nextNumber}`);
 
     set((state) => ({ tasks: [...state.tasks, task] }));
-
-    addTaskToDB(task);
-  },
-
-  addTask: (task: TTask) => {
-    const tasks = get().tasks;
-    const alreadyExists = tasks.some((t) => t.localId === task.localId);
-    if (!alreadyExists) {
-      set({ tasks: [...tasks, task] });
-    }
 
     addTaskToDB(task);
   },
@@ -70,6 +52,14 @@ const useTaskStore = create<TaskState>((set, get) => ({
     }));
 
     updateTaskInDB(task);
+  },
+
+  deleteTask: (taskLocalId: string) => {
+    set((state) => ({
+      tasks: state.tasks.filter((t) => t.localId !== taskLocalId),
+    }));
+    console.log("\n\nTasks after Deletion: ", get().tasks);
+    deleteTaskfromDB(taskLocalId);
   },
 
   getTasks: (filter?: FilterOptions) => {

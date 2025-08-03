@@ -14,6 +14,9 @@ import {
 import React, { useCallback, useState } from 'react';
 import TLabel from "@/types/label";
 import truncateLabel from '@/helpers/truncateLabel';
+import getStatusColor from '@/helpers/statusColor';
+import useLabelStore from '@/store/labelStore';
+import { createNewLabel } from '@/helpers/createNewLabel';
 
 type TaskInfoProps = {
   active: boolean;
@@ -32,26 +35,12 @@ const TaskInfo = ({
   onStatusChange,
   onLabelChange,
 }: TaskInfoProps) => {
-  
-  const getStatusColor = (status: string) => {
-    switch (status.toLowerCase()) {
-      case 'pending':
-        return '#ff9800';
-      case 'in progress':
-        return '#2196f3';
-      default:
-        return 'grey';
-    }
-  };
-
   const getCompactLabel = useCallback(truncateLabel, [])
+  
+  const labels = useLabelStore((state) => state.labels);
+  const addLabel = useLabelStore((state) => state.addLabel);
 
-  const [labelOptions, setLabelOptions] = useState<TLabel[]>([
-    { labelId: "red-label", labelName: 'Work', color: 'red' },
-    { labelId: "blue-label", labelName: 'Coding', color: 'blue' },
-  ]);
-
-  const currentLabel = labelOptions.find((l) => l.labelId === labelId);
+  const currentLabel = labels.find((l) => l.localId === labelId);
   const labelColor = currentLabel?.color ?? 'gray';
 
   const [openAddDialog, setOpenAddDialog] = useState(false);
@@ -64,14 +53,10 @@ const TaskInfo = ({
     const trimmedTitle = newLabelTitle.trim();
     if (!trimmedTitle) return;
 
-    const newLabel: TLabel = {
-      labelId: `${newLabelColor}-label`,
-      labelName: trimmedTitle,
-      color: newLabelColor,
-    };
+    const newLabel: TLabel = createNewLabel(trimmedTitle, newLabelColor);
+    addLabel(newLabel);
 
-    setLabelOptions((prev) => [...prev, newLabel]);
-    onLabelChange(newLabel.labelName);
+    onLabelChange(newLabel.localId);
     setNewLabelTitle('');
     setNewLabelColor('#6b3d8f');
     setOpenAddDialog(false);
@@ -208,7 +193,7 @@ const TaskInfo = ({
                 },
               }}
               renderValue={(selected) => {
-                const selectedLabel = labelOptions.find((l) => l.labelId === selected);
+                const selectedLabel = labels.find((l) => l.localId === selected);
                 if (!selectedLabel) {
                   return (
                     <Chip
@@ -239,8 +224,8 @@ const TaskInfo = ({
                 );
               }}
             >
-              {labelOptions.map((option) => (
-                <MenuItem key={option.labelId} value={option.labelName}>
+              {labels.map((option) => (
+                <MenuItem key={option.localId} value={option.localId}>
                   <Typography sx={{ fontWeight: 500, fontSize: 14, color: option.color }}>
                     {option.labelName}
                   </Typography>

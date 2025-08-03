@@ -2,33 +2,8 @@
 import React from 'react'
 import TaskContainer from './TaskContainer.component'
 import TTask from '@/types/task';
-
-const mockTasks: TTask[] = [
-  {
-    localId: '1',
-    title: 'Finish UI Design',
-    description: 'Design the header and sidebar layout.',
-    labelId: 'work',
-    tags: ['ui', 'priority'],
-    startDate: new Date(),
-    dueDate: new Date(Date.now() + 86400000),
-    priority: 'high',
-    status: 'in progress',
-    synced: false,
-  },
-  {
-    localId: '2',
-    title: 'Write Documentation',
-    description: 'Add usage section in README.md',
-    labelId: 'work',
-    tags: ['docs'],
-    startDate: null,
-    dueDate: null,
-    priority: 'medium',
-    status: 'pending',
-    synced: true,
-  },
-];
+import { Box } from '@mui/material';
+import useTaskStore from '@/store/taskStore';
 
 type TaskBoardProps = {
   tasksByLabel: {
@@ -37,14 +12,16 @@ type TaskBoardProps = {
 };
 
 const TaskBoard = ({ tasksByLabel }: TaskBoardProps) => {
+  const updateTask = useTaskStore((state) => state.updateTask);
+  const deleteTask = useTaskStore((state) => state.deleteTask);
   const hasTasks = Object.values(tasksByLabel).some(arr => arr.length > 0);
 
   const handleUpdateTask = (updatedTask: TTask) => {
-    console.log('Task updated:', updatedTask);
+    updateTask(updatedTask);
   };
 
   const handleDeleteTask = (taskId: string) => {
-    console.log('Delete task:', taskId);
+    deleteTask(taskId);
   };
 
   if (!hasTasks) {
@@ -56,16 +33,17 @@ const TaskBoard = ({ tasksByLabel }: TaskBoardProps) => {
   }
 
   return (
-    <div className="flex gap-4 px-4 overflow-x-auto">
+    <Box sx={{mt: 5}}>
       {Object.entries(tasksByLabel).map(([label, tasks]) => (
         <TaskContainer
+          key={label || "unlabeled"}
           label={label || "unlabeled"}
           tasks={tasks}
           handleUpdateTask={handleUpdateTask}
           handleDeleteTask={handleDeleteTask}
         />
       ))}
-    </div>
+    </Box>
   );
 }
 

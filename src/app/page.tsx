@@ -2,6 +2,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import BootstrapApp from "@/components/BootstrapApp";
 import { getAllTasks } from "@/services/mongoDB/taskServices";
+import { getAllLabels } from "@/services/mongoDB/labelServices";
 
 export default async function Page() {
   const cookieStore = await cookies();
@@ -12,5 +13,6 @@ export default async function Page() {
   }
 
   const tasks = await getAllTasks();
-  return <BootstrapApp tasks={tasks} />;
+  const labels = await getAllLabels();
+  return <BootstrapApp tasks={tasks} labels={labels}/>;
 }

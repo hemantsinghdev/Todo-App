@@ -1,5 +1,5 @@
 type TLabel = {
-  labelId: string;
+  localId: string;
   labelName: string;
   color: string;
 };
