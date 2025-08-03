@@ -22,7 +22,7 @@ const TaskTitle = ({ title, isEditing, onChange, showEmptyError = false }: TaskT
   };
 
   return (
-    <Box sx={{ width: isEditing ? '42%' : '60%' }}>
+    <Box sx={{ width: isEditing ? '40%' : '60%' }}>
       {isEditing ? (
         <TextField
           variant="outlined"

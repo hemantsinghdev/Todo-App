@@ -11,29 +11,34 @@ import {
   TextField,
   Button,
 } from '@mui/material';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import TLabel from "@/types/label";
 import truncateLabel from '@/helpers/truncateLabel';
 import getStatusColor from '@/helpers/statusColor';
 import useLabelStore from '@/store/labelStore';
 import { createNewLabel } from '@/helpers/createNewLabel';
+import { Cancel } from '@mui/icons-material';
 
 type TaskInfoProps = {
   active: boolean;
   isEditing: boolean;
-  status: "pending" | "in progress" | "completed";
+  status: "pending" | "in progress";
+  completed: boolean;
   labelId?: string;
   onStatusChange: (newStatus: "pending" | "in progress") => void;
   onLabelChange: (newLabel: string) => void;
+  removeLabel: () => void;
 };
 
 const TaskInfo = ({
   active,
   isEditing,
   status,
+  completed,
   labelId,
   onStatusChange,
   onLabelChange,
+  removeLabel,
 }: TaskInfoProps) => {
   const getCompactLabel = useCallback(truncateLabel, [])
   
@@ -43,11 +48,16 @@ const TaskInfo = ({
   const currentLabel = labels.find((l) => l.localId === labelId);
   const labelColor = currentLabel?.color ?? 'gray';
 
+  const [currentStatus, setCurrentStatus] = useState(completed === true ? "completed" : status)
   const [openAddDialog, setOpenAddDialog] = useState(false);
   const [newLabelTitle, setNewLabelTitle] = useState('');
   const [newLabelColor, setNewLabelColor] = useState('#6b3d8f');
 
   const statusOptions = ['pending', 'in progress'];
+
+  useEffect(() => {
+    setCurrentStatus(completed === true ? "completed" : status);
+  }, [completed, status])
 
   const handleAddNewLabel = () => {
     const trimmedTitle = newLabelTitle.trim();
@@ -65,74 +75,6 @@ const TaskInfo = ({
   return (
     <>
       <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: labelId || isEditing ? 1 : 0 }}>
-        {/* Status */}
-        <Box
-          sx={{
-            transition: 'transform 0.5s ease',
-            transform: active || isEditing ? 'translateX(-75px)' : 'translateX(0)',
-            margin: isEditing || !labelId ? 0 : '3px',
-          }}
-        >
-          {isEditing ? (
-            <Select
-              size="small"
-              value={status}
-              onChange={(e) => onStatusChange(e.target.value as ("pending" | "in progress"))}
-              variant="outlined"
-              sx={{
-                height: 25,
-                fontSize: 14,
-                fontWeight: 500,
-                color: getStatusColor(status),
-                textTransform: 'capitalize',
-                '.MuiOutlinedInput-notchedOutline': {
-                  borderRadius: 1,
-                },
-              }}
-              renderValue={(value) => {
-                return (
-                  <Typography
-                    sx={{
-                      fontWeight: 600,
-                      fontSize: labelId ? '14px' : '16px',
-                      color: getStatusColor(status),
-                      textTransform: 'capitalize',
-                    }}
-                  >
-                    {value}
-                  </Typography>
-                )
-              }}
-            >
-              {statusOptions.map((option) => (
-                <MenuItem key={option} value={option}>
-                  <Typography
-                    sx={{
-                      fontWeight: 500,
-                      fontSize: 14,
-                      textTransform: 'capitalize',
-                      color: getStatusColor(option),
-                    }}
-                  >
-                    {option}
-                  </Typography>
-                </MenuItem>
-              ))}
-            </Select>
-          ) : (
-            <Typography
-              sx={{
-                fontWeight: 600,
-                fontSize: labelId ? '14px' : '16px',
-                color: getStatusColor(status),
-                textTransform: 'capitalize',
-              }}
-            >
-              {status}
-            </Typography>
-          )}
-        </Box>
-
         {/* Label */}
         <Box
           sx={{
@@ -187,6 +129,7 @@ const TaskInfo = ({
               sx={{
                 padding: 0,
                 minWidth: 0,
+                height: 20,
                 cursor: 'pointer',
                 '& .MuiSelect-select': {
                   padding: '0 !important',
@@ -204,7 +147,10 @@ const TaskInfo = ({
                         fontWeight: 500,
                         borderRadius: 1,
                         fontSize: 14,
-                        height: 24,
+                        height: 20,
+                        '.MuiChip-label':{
+                          px: '6px'
+                        }
                       }}
                     />
                   );
@@ -218,7 +164,10 @@ const TaskInfo = ({
                       fontWeight: 500,
                       borderRadius: 1,
                       fontSize: 14,
-                      height: 24,
+                      height: 20,
+                      '.MuiChip-label':{
+                        px: '6px'
+                      }
                     }}
                   />
                 );
@@ -252,17 +201,100 @@ const TaskInfo = ({
             currentLabel && (
               <Chip
                 label={getCompactLabel(currentLabel.labelName)}
+                onDelete={removeLabel}
+                deleteIcon={<Cancel/>}
                 sx={{
                   bgcolor: labelColor,
                   color: 'white',
                   borderRadius: 1,
-                  height: 24,
+                  height: 20,
                   fontSize: 14,
+                  '.MuiChip-label':{
+                    px: '6px'
+                  },
+                  '.MuiChip-deleteIcon':{
+                    fontSize: '14px',
+                    opacity: 1,
+                    color: 'white',
+                    margin: '0 3px 0 0',
+                  }
                 }}
               />
             )
           )}
         </Box>
+
+        {/* Status */}
+        <Box
+          sx={{
+            transition: 'transform 0.5s ease',
+            transform: active || isEditing ? 'translateX(-75px)' : 'translateX(0)',
+            margin: isEditing ? 0 : '3px',
+          }}
+        >
+          {isEditing ? (
+            <Select
+              size="small"
+              value={currentStatus}
+              onChange={(e) => onStatusChange(e.target.value as ("pending" | "in progress"))}
+              variant="outlined"
+              disabled={completed}
+              sx={{
+                height: 20,
+                fontSize: 14,
+                fontWeight: 500,
+                color: getStatusColor(currentStatus),
+                textTransform: 'capitalize',
+                '.MuiOutlinedInput-notchedOutline': {
+                  borderRadius: 1,
+                },
+              }}
+              renderValue={(value) => {
+                return (
+                  <Typography
+                    sx={{
+                      fontWeight: 600,
+                      fontSize: labelId ? '14px' : '16px',
+                      color: getStatusColor(status),
+                      textTransform: 'capitalize',
+                    }}
+                  >
+                    {value}
+                  </Typography>
+                )
+              }}
+            >
+              {statusOptions.map((option) => (
+                <MenuItem key={option} value={option}>
+                  <Typography
+                    sx={{
+                      fontWeight: 500,
+                      fontSize: 14,
+                      textTransform: 'capitalize',
+                      color: getStatusColor(option),
+                    }}
+                  >
+                    {option}
+                  </Typography>
+                </MenuItem>
+              ))}
+            </Select>
+          ) : (
+            <Typography
+              sx={{
+                fontWeight: 600,
+                fontSize: '14px',
+                color: getStatusColor(currentStatus),
+                textTransform: 'capitalize',
+                width: '78px',
+                textAlign:'right',
+              }}
+            >
+              {currentStatus}
+            </Typography>
+          )}
+        </Box>
+
       </Box>
 
       {/* Add Label Dialog */}

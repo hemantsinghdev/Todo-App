@@ -3,19 +3,21 @@ import { Box, Checkbox } from "@mui/material";
 type TaskCheckProps = {
   isEditing: boolean;
   status: string;
-  onChange: (newStatus: 'completed' | 'in progress') => void;
+  completed: boolean;
+  toggleCheck: (checked: boolean) => void;
 };
 
-const TaskCheck = ({ isEditing, status, onChange }: TaskCheckProps) => {
+const TaskCheck = ({ isEditing, status, completed, toggleCheck }: TaskCheckProps) => {
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    onChange(event.target.checked ? 'completed' : 'in progress');
+    // console.log(event.target.checked);
+    toggleCheck(event.target.checked);
   };
 
   return (
     <Box>
       <Checkbox
         disabled={isEditing}
-        checked={status === 'completed'}
+        checked={completed}
         onChange={handleChange}
       />
     </Box>

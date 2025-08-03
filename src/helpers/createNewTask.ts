@@ -6,6 +6,7 @@ export function createNewTask(title: string): TTask {
     localId: uuidv4(),
     title: title,
     status: "pending",
+    completed: false,
     startDate: null,
     dueDate: null,
     synced: false,

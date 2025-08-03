@@ -22,11 +22,13 @@ export default function TaskContainer({
       sx={{
         border: '1px solid #000',
         borderRadius: 2,
-        p: 2,
+        display: 'flex',
+        justifyContent: 'center',
+        p: 2.5,
         mb: 6,
         position: 'relative',
         pl: 2,
-        width: 64,
+        width: 660,
       }}
     >
       <Box

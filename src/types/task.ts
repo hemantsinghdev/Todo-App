@@ -7,7 +7,8 @@ type TTask = {
   startDate: Date | null;
   dueDate: Date | null;
   priority?: "low" | "medium" | "high";
-  status: "pending" | "in progress" | "completed";
+  status: "pending" | "in progress";
+  completed: boolean;
   synced: boolean;
 };
 

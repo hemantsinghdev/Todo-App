@@ -42,10 +42,11 @@ const TaskButtons = ({
     <>
       <Box
         sx={{
-          display: 'flex',
+          display: "flex",
           alignItems: 'center',
           position: 'absolute',
           right: 0,
+          pointerEvents: active || isEditing ? 'auto' : 'none',
           opacity: active || isEditing ? 1 : 0,
           transition: 'opacity 0.3s ease 0.1s, transform 0.4s ease 0.1s',
           gap: 1,

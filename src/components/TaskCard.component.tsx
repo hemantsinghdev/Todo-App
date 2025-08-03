@@ -23,29 +23,6 @@ const TaskCard = ({task, handleUpdateTask, handleDelete}: TaskCardProps) => {
     const [draftTask, setDraftTask] = useState(task);
     const [showEmptyTitleError, setShowEmptyTitleError] = useState(false);
 
-    const wrapperRef = useRef<HTMLDivElement>(null);
-    useEffect(() => {
-      function handleClickOutside(event: MouseEvent) {
-        const target = event.target as HTMLElement;
-
-        if (wrapperRef.current && !wrapperRef.current.contains(target)) {
-          if (
-            document.querySelector('[role="presentation"]')?.contains(target) ||
-            target.closest('.MuiButtonBase-root') ||
-            target.closest('.MuiYearCalendar-button')
-          ) {
-            return;
-          }
-          setDraftTask(task);
-          setIsEditing(false);
-        }
-      }
-      document.addEventListener("mousedown", handleClickOutside);
-      return () => {
-        document.removeEventListener("mousedown", handleClickOutside);
-      };
-    }, [task]);
-
     useEffect(() => {
         setDraftTask(task);
     }, [task]);
@@ -62,6 +39,29 @@ const TaskCard = ({task, handleUpdateTask, handleDelete}: TaskCardProps) => {
             setDraftTask(prev => ({ ...prev, [field]: value }))
         }, [])
 
+    const toggleCheck = useCallback(
+          (checked: boolean) => {
+            const updatedTask: TTask = { ...draftTask, completed: checked };
+            setDraftTask(updatedTask);
+            handleUpdateTask(updatedTask);
+            setActive(false);
+          },
+          [draftTask, handleUpdateTask]
+        );
+    
+    const removeLabel = useCallback(
+        () => {
+            const updatedTask: TTask = {...draftTask, labelId: undefined};
+            setDraftTask(updatedTask);
+            handleUpdateTask(updatedTask);
+        }
+        , [draftTask, handleUpdateTask]
+    )
+    
+    const deleteTask = useCallback(() => {
+        handleDelete(task.localId);
+    }, [handleDelete])
+
     const handleSave = () => {
         if (!draftTask.title.trim()) {
             setShowEmptyTitleError(true);
@@ -71,17 +71,12 @@ const TaskCard = ({task, handleUpdateTask, handleDelete}: TaskCardProps) => {
             setShowEmptyTitleError(false);
             handleUpdateTask(draftTask);
         }
-        setIsEditing(false);
         setActive(false);
-    }
-
-    const deleteTask = () => {
-        handleDelete(task.localId);
+        setIsEditing(false);
     }
 
   return (
     <Paper
-        ref = {wrapperRef}
         elevation={0}
         sx={{
             width: 600,
@@ -92,17 +87,17 @@ const TaskCard = ({task, handleUpdateTask, handleDelete}: TaskCardProps) => {
             display: 'flex',
             justifyContent: 'space-between',
         }}
+        onClick={() => setActive((prev) => !prev)}
     >
         <TaskCheck
             isEditing={isEditing}
             status={draftTask.status}
-            onChange={(v) => handleFieldChange('status', v)}
+            completed={draftTask.completed}
+            toggleCheck={toggleCheck}
         />
 
         <Box sx={{my:'9px', mx: '5px'}}
         flexGrow={1}
-        onMouseEnter={() => setActive(true)}
-        onMouseLeave={() => setActive(false)}
         >
             <Box sx={{display: 'flex', alignItems:'flex-start', justifyContent:'space-between'}}>
                 <TaskTitle 
@@ -121,10 +116,12 @@ const TaskCard = ({task, handleUpdateTask, handleDelete}: TaskCardProps) => {
                         <TaskInfo 
                             active={active} 
                             isEditing={isEditing}
-                            status={draftTask.status} 
+                            status={draftTask.status}
+                            completed={draftTask.completed} 
                             labelId={draftTask.labelId}
                             onStatusChange={(val) => handleFieldChange('status', val)}
                             onLabelChange={(val) => handleFieldChange('labelId', val)}
+                            removeLabel={removeLabel}
                         />
                         <TaskButtons 
                             active={active}
