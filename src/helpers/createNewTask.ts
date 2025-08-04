@@ -2,6 +2,8 @@ import { v4 as uuidv4 } from "uuid";
 import TTask from "@/types/task";
 
 export function createNewTask(title: string): TTask {
+  const currentTime = new Date();
+
   return {
     localId: uuidv4(),
     title: title,
@@ -10,5 +12,7 @@ export function createNewTask(title: string): TTask {
     startDate: null,
     dueDate: null,
     synced: false,
+    createdAt: currentTime,
+    updatedAt: currentTime,
   };
 }

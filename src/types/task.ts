@@ -10,6 +10,11 @@ type TTask = {
   status: "pending" | "in progress";
   completed: boolean;
   synced: boolean;
+  orderByView?: {
+    [viewKey: string]: number;
+  };
+  createdAt: Date;
+  updatedAt: Date;
 };
 
 export default TTask;

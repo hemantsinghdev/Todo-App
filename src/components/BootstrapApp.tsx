@@ -24,7 +24,7 @@ export default function BootstrapApp({ tasks, labels }: { tasks: TTask[], labels
       await initializeLabelDB(labels);
 
       Cookies.set("isSynced", Date.now().toString(), { expires: 1 });
-      router.replace("/tasks");
+      router.replace("/today");
     };
     initialize();
   }, [router, setTasks, tasks]);

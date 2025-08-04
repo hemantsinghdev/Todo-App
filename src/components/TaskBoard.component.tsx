@@ -34,7 +34,9 @@ const TaskBoard = ({ tasksByLabel }: TaskBoardProps) => {
 
   return (
     <Box sx={{mt: 5}}>
-      {Object.entries(tasksByLabel).map(([label, tasks]) => (
+      {Object.entries(tasksByLabel).map(([label, tasks]) => {
+        if (tasks.length === 0) return null;
+        return(
         <TaskContainer
           key={label || "unlabeled"}
           label={label || "unlabeled"}
@@ -42,7 +44,8 @@ const TaskBoard = ({ tasksByLabel }: TaskBoardProps) => {
           handleUpdateTask={handleUpdateTask}
           handleDeleteTask={handleDeleteTask}
         />
-      ))}
+        )
+    })}
     </Box>
   );
 }

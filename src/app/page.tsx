@@ -9,7 +9,7 @@ export default async function Page() {
   const isSynced = cookieStore.get("isSynced");
 
   if (isSynced) {
-    redirect("/tasks");
+    redirect("/today");
   }
 
   const tasks = await getAllTasks();

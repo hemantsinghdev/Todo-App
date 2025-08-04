@@ -1,41 +1,25 @@
-"use client";
-import { useEffect, useState } from "react";
-import useTaskStore from "@/store/taskStore";
-import { getAllTasks } from "@/services/indexedDB/taskServices";
-import TaskBoard from "@/components/TaskBoard.component";
-import useLabelStore from "@/store/labelStore";
-import { getAllLabels } from "@/services/indexedDB/labelServices";
+import { notFound } from "next/navigation";
+import TaskPage from "@/components/TaskPage.component";
 
-export default function TaskPage() {
-  const tasks = useTaskStore(state => state.tasks);
-  const labels = useLabelStore(state => state.labels);
-  const setTasks = useTaskStore(state => state.setTasks);
-  const setLabels = useLabelStore(state => state.setlabels);
+const validFeatures = ['today', 'upcoming', 'expired', 'completed', 'all'] as const;
+type FeatureOptions = typeof validFeatures[number];
 
-  const [loading, setLoading] = useState(false);
+interface PageProps {
+  params: { feature: string };
+}
 
-  useEffect(() => {
-    const hydrateFromIndexedDB = async () => {
-      if (tasks.length === 0 || labels.length === 0) {
-        setLoading(true);
-        if (tasks.length === 0){
-          const storedTasks = await getAllTasks();
-          setTasks(storedTasks);
-        }
-        if (labels.length === 0){
-          const storedLabels = await getAllLabels();
-          setLabels(storedLabels);
-        }
-        setLoading(false);
-      }
-    };
+export async function generateStaticParams() {
+  return validFeatures.map((feature) => ({ feature }));
+}
 
-    hydrateFromIndexedDB();
-  }, []);
+export default async function Page({ params }: PageProps) {
+  const { feature } = await params;
 
-  if (loading) {
-    return <div className="text-center mt-10 text-gray-500">Loading your tasks...</div>;
+  if (!validFeatures.includes(feature as FeatureOptions)) {
+    notFound();
   }
 
-  return <TaskBoard tasksByLabel={{"all": tasks}}/>;
+  const filter = feature as FeatureOptions;
+
+  return <TaskPage filter={filter} />;
 }

@@ -78,6 +78,7 @@ const TaskCard = ({task, handleUpdateTask, handleDelete}: TaskCardProps) => {
   return (
     <Paper
         elevation={0}
+        draggable
         sx={{
             width: 600,
             maxWidth: 800,

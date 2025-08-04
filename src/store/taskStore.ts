@@ -18,7 +18,6 @@ type TaskState = {
   newTask: () => void;
   updateTask: (task: TTask) => void;
   deleteTask: (taskLocalId: string) => void;
-  getTasks: (filter?: FilterOptions) => TTask[];
 };
 
 const useTaskStore = create<TaskState>((set, get) => ({
@@ -47,8 +46,11 @@ const useTaskStore = create<TaskState>((set, get) => ({
   },
 
   updateTask: (task: TTask) => {
+    const currentTime = new Date();
     set((state) => ({
-      tasks: state.tasks.map((t) => (t.localId === task.localId ? task : t)),
+      tasks: state.tasks.map((t) =>
+        t.localId === task.localId ? { ...task, updatedAt: currentTime } : t
+      ),
     }));
 
     updateTaskInDB(task);
@@ -58,38 +60,7 @@ const useTaskStore = create<TaskState>((set, get) => ({
     set((state) => ({
       tasks: state.tasks.filter((t) => t.localId !== taskLocalId),
     }));
-    console.log("\n\nTasks after Deletion: ", get().tasks);
     deleteTaskfromDB(taskLocalId);
-  },
-
-  getTasks: (filter?: FilterOptions) => {
-    const tasks = get().tasks;
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    let filtered = [...tasks];
-
-    if (filter?.labelId) {
-      filtered = filtered.filter((t) => t.labelId === filter.labelId);
-    }
-
-    if (filter?.day) {
-      filtered = filtered.filter((t) => {
-        const start = t.startDate ? new Date(t.startDate) : null;
-        const end = t.dueDate ? new Date(t.dueDate) : null;
-
-        switch (filter.day) {
-          case "today":
-            return (!start || start <= today) && (!end || end >= today);
-          case "upcoming":
-            return start && start > today;
-          case "expired":
-            return end && end < today;
-        }
-      });
-    }
-
-    return filtered;
   },
 }));
 
