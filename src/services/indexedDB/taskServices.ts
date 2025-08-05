@@ -29,3 +29,11 @@ export async function updateTaskInDB(task: TTask): Promise<void> {
 export async function getAllTasks(): Promise<TTask[]> {
   return await taskDB.tasks.toArray();
 }
+
+export async function updateMultipleTasks(tasks: TTask[]): Promise<void> {
+  try {
+    await taskDB.tasks.bulkPut(tasks);
+  } catch (err) {
+    console.error("Bulk update failed:", err);
+  }
+}

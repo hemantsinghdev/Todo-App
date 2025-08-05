@@ -40,6 +40,11 @@ export default function TaskPage({ filter }: { filter: FeatureOptions }) {
 
   useEffect(() => {
     const byLabel = getTasksByLabel(labels, tasks);
+
+    for (const label in byLabel) {
+      byLabel[label].sort((a, b) => a.orderByLabel - b.orderByLabel);
+    }
+
     const filtered = filterTasks(filter, byLabel);
     setTasksByLabel(filtered);
   }, [tasks, labels, filter]);

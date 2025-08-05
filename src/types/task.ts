@@ -10,9 +10,7 @@ type TTask = {
   status: "pending" | "in progress";
   completed: boolean;
   synced: boolean;
-  orderByView?: {
-    [viewKey: string]: number;
-  };
+  orderByLabel: number;
   createdAt: Date;
   updatedAt: Date;
 };

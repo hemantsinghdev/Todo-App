@@ -1,4 +1,3 @@
-'use client';
 import { Box, Stack } from '@mui/material';
 import TaskCard from './TaskCard.component';
 import TTask from '@/types/task';
@@ -43,7 +42,7 @@ export default function TaskContainer({
       >
         {label}
       </Box>
-
+      
       <Stack spacing={2}>
         {tasks.map((task) => (
           <TaskCard
@@ -54,6 +53,7 @@ export default function TaskContainer({
           />
         ))}
       </Stack>
+  
     </Box>
   );
 }

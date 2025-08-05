@@ -3,9 +3,11 @@ import TTask from "@/types/task";
 import {
   addTaskToDB,
   deleteTaskfromDB,
+  updateMultipleTasks,
   updateTaskInDB,
 } from "@/services/indexedDB/taskServices";
 import { createNewTask } from "@/helpers/createNewTask";
+import getMaxOrderForLabel from "@/helpers/maxOrderForLabel";
 
 type FilterOptions = {
   labelId?: string;
@@ -18,6 +20,7 @@ type TaskState = {
   newTask: () => void;
   updateTask: (task: TTask) => void;
   deleteTask: (taskLocalId: string) => void;
+  updateTaskOrder: (updatedTasks: TTask[]) => void;
 };
 
 const useTaskStore = create<TaskState>((set, get) => ({
@@ -38,19 +41,29 @@ const useTaskStore = create<TaskState>((set, get) => ({
     const nextNumber =
       untitledCount.length > 0 ? Math.max(...untitledCount) + 1 : 1;
 
-    const task: TTask = createNewTask(`untitled_${nextNumber}`);
+    const newTask: TTask = createNewTask(`untitled_${nextNumber}`);
 
-    set((state) => ({ tasks: [...state.tasks, task] }));
+    newTask.orderByLabel = getMaxOrderForLabel(tasks) + 1;
 
-    addTaskToDB(task);
+    set((state) => ({ tasks: [...state.tasks, newTask] }));
+
+    addTaskToDB(newTask);
   },
 
   updateTask: (task: TTask) => {
+    const tasks = get().tasks;
     const currentTime = new Date();
+
     set((state) => ({
-      tasks: state.tasks.map((t) =>
-        t.localId === task.localId ? { ...task, updatedAt: currentTime } : t
-      ),
+      tasks: state.tasks.map((t) => {
+        if (t.localId === task.localId) {
+          if (t.labelId != task.labelId) {
+            task.orderByLabel = getMaxOrderForLabel(tasks, task.labelId) + 1;
+          }
+          return { ...task, updatedAt: currentTime };
+        }
+        return t;
+      }),
     }));
 
     updateTaskInDB(task);
@@ -61,6 +74,16 @@ const useTaskStore = create<TaskState>((set, get) => ({
       tasks: state.tasks.filter((t) => t.localId !== taskLocalId),
     }));
     deleteTaskfromDB(taskLocalId);
+  },
+
+  updateTaskOrder: (updatedTasks: TTask[]) => {
+    set((state) => ({
+      tasks: state.tasks.map((t) => {
+        const updated = updatedTasks.find((ut) => ut.localId === t.localId);
+        return updated ? { ...t, ...updated } : t;
+      }),
+    }));
+    updateMultipleTasks(updatedTasks);
   },
 }));
 

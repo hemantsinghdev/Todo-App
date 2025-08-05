@@ -1,5 +1,7 @@
 import { Box, Chip, Paper } from "@mui/material"
 import { useCallback, useEffect, useRef, useState } from "react";
+import { AnimateLayoutChanges, useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import {
     TaskCheck,
     TaskTitle,
@@ -23,6 +25,15 @@ const TaskCard = ({task, handleUpdateTask, handleDelete}: TaskCardProps) => {
     const [draftTask, setDraftTask] = useState(task);
     const [showEmptyTitleError, setShowEmptyTitleError] = useState(false);
 
+    
+const animateLayoutChanges: AnimateLayoutChanges = (args) => {
+  const { isSorting, wasDragging } = args;
+  console.log("isSorting ans wasDragging : ", isSorting, wasDragging)
+  return isSorting || wasDragging;
+};
+
+    const {attributes, listeners, setNodeRef, transform, transition, isDragging} = useSortable({id: task.localId, disabled: isEditing, animateLayoutChanges})
+
     useEffect(() => {
         setDraftTask(task);
     }, [task]);
@@ -32,7 +43,6 @@ const TaskCard = ({task, handleUpdateTask, handleDelete}: TaskCardProps) => {
         setShowEmptyTitleError(false);
       }
     }, [isEditing]);
-
 
     const handleFieldChange = useCallback(
         <K extends keyof TTask>(field: K, value: TTask[K]) => {
@@ -78,8 +88,13 @@ const TaskCard = ({task, handleUpdateTask, handleDelete}: TaskCardProps) => {
   return (
     <Paper
         elevation={0}
-        draggable
+        ref={setNodeRef}
+        {...attributes}
+        {...(!isEditing ? listeners : {})}
         sx={{
+            transform: CSS.Transform.toString(transform),
+            opacity: isDragging ? 0 : 1,
+            transition,
             width: 600,
             maxWidth: 800,
             p: 0.5,
