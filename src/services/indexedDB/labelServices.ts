@@ -10,7 +10,15 @@ export async function addLabelToDB(label: TLabel): Promise<void> {
   try {
     await labelDB.labels.add(label);
   } catch (error) {
-    console.error("Failed to add task to IndexedDB:", error);
+    console.error("Failed to add label to IndexedDB:", error);
+  }
+}
+
+export async function updateLabelInDB(label: TLabel): Promise<void> {
+  try {
+    await labelDB.labels.put(label);
+  } catch (error) {
+    console.error("Failed to update label in IndexedDB:", error);
   }
 }
 
@@ -18,7 +26,7 @@ export async function deleteLabelfromDB(labelLocalId: string): Promise<void> {
   try {
     await labelDB.labels.delete(labelLocalId);
   } catch (error) {
-    console.error("Failed to remove task from IndexedDB:", error);
+    console.error("Failed to remove label from IndexedDB:", error);
   }
 }
 

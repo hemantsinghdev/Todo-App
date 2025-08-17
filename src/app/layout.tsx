@@ -26,6 +26,7 @@ export default function RootLayout({
               <Box
                 component="main"
                 sx={{ml: '240px'}}
+                width={'100%'}
               >
                 {children}
               </Box>

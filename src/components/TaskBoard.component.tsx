@@ -116,7 +116,7 @@ const TaskBoard = ({ tasksByLabel }: TaskBoardProps) => {
       onDragStart={(event) => setActiveId(event.active.id as string)}
       onDragCancel={() => setActiveId(null)}
     >
-        <Box sx={{ mt: 5 }}>
+        <Box sx={{ mt: 5, width: "100%", display: 'flex', flexDirection: 'column',  justifyContent: 'center', alignItems: 'center' }}>
           {Object.entries(tasksByLabel).map(([label, tasks]) => {
             if (tasks.length === 0) return null;
             return (

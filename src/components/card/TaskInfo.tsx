@@ -106,6 +106,7 @@ const TaskInfo = ({
                     boxShadow: 3,
                     overflow: 'auto',
                     maxHeight: 168,
+                    maxWidth: 140,
                     '&::-webkit-scrollbar': {
                       // display: 'none',
                       width: "4px",
@@ -175,7 +176,7 @@ const TaskInfo = ({
             >
               {labels.map((option) => (
                 <MenuItem key={option.localId} value={option.localId}>
-                  <Typography sx={{ fontWeight: 500, fontSize: 14, color: option.color }}>
+                  <Typography noWrap sx={{ fontWeight: 500, fontSize: 14, color: option.color }}>
                     {option.labelName}
                   </Typography>
                 </MenuItem>
