@@ -10,7 +10,7 @@ import {
     TaskDescription,
     TaskDates,
     TaskPriority,
-} from './card';
+} from './taskCard';
 import TTask from "@/types/task";
 
 type TaskCardProps = {
@@ -27,8 +27,8 @@ const TaskCard = ({task, handleUpdateTask, handleDelete}: TaskCardProps) => {
 
     
 const animateLayoutChanges: AnimateLayoutChanges = (args) => {
-  const { isSorting, wasDragging } = args;
-  console.log("isSorting ans wasDragging : ", isSorting, wasDragging)
+    //For MultiContainer Dnd movement, but bug
+    const { isSorting, wasDragging } = args;
   return isSorting || wasDragging;
 };
 

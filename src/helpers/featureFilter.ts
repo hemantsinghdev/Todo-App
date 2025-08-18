@@ -4,14 +4,16 @@ type featureOptions = "today" | "upcoming" | "expired" | "completed" | "all";
 
 const featureFilter = (
   filter: featureOptions,
-  labeledTasks: { [labelName: string]: TTask[] }
+  labelledTasks: { [labelId: string]: { labelName: string; tasks: TTask[] } }
 ): { [labelName: string]: TTask[] } => {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
   const result: { [labelName: string]: TTask[] } = {};
 
-  for (const [label, tasks] of Object.entries(labeledTasks)) {
+  for (const labelledTask of Object.values(labelledTasks)) {
+    const { labelName, tasks } = labelledTask;
+
     const filtered = tasks.filter((t) => {
       const start = t.startDate ? new Date(t.startDate) : null;
       const end = t.dueDate ? new Date(t.dueDate) : null;
@@ -22,12 +24,9 @@ const featureFilter = (
       const isToday =
         (!start || start <= today) && (!end || end >= today) && !isCompleted;
 
-      //   const isMissingDates = !start && !end && !isCompleted;
-
       switch (filter) {
         case "today":
           return isToday;
-        //   return (isToday || isMissingDates) && !isUpcoming && !isExpired;
         case "upcoming":
           return isUpcoming;
         case "expired":
@@ -42,7 +41,7 @@ const featureFilter = (
     });
 
     if (filtered.length > 0) {
-      result[label] = filtered;
+      result[labelName] = filtered;
     }
   }
 

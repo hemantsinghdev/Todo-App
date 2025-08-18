@@ -8,7 +8,6 @@ import {
   DndContext,
   DragEndEvent,
   DragOverlay,
-  MeasuringStrategy,
   MouseSensor,
   closestCenter,
   useSensor,
@@ -21,12 +20,13 @@ import {
 import TaskCard from "./TaskCard.component";
 
 type TaskBoardProps = {
+  dndEnabled: boolean;
   tasksByLabel: {
     [labelName: string]: TTask[];
   };
 };
 
-const TaskBoard = ({ tasksByLabel }: TaskBoardProps) => {
+const TaskBoard = ({ tasksByLabel, dndEnabled }: TaskBoardProps) => {
   const updateTask = useTaskStore((state) => state.updateTask);
   const updateTaskOrder = useTaskStore((state) => state.updateTaskOrder);
   const deleteTask = useTaskStore((state) => state.deleteTask);
@@ -110,8 +110,8 @@ const TaskBoard = ({ tasksByLabel }: TaskBoardProps) => {
 
   return (
     <DndContext 
-      sensors={sensors} 
-      onDragEnd={handleDragEnd} 
+      sensors={sensors}
+      onDragEnd={dndEnabled ? handleDragEnd : undefined}
       collisionDetection={closestCenter}
       onDragStart={(event) => setActiveId(event.active.id as string)}
       onDragCancel={() => setActiveId(null)}
@@ -126,7 +126,6 @@ const TaskBoard = ({ tasksByLabel }: TaskBoardProps) => {
             strategy={verticalListSortingStrategy}
           >
             <TaskContainer
-                // key={label || "unlabeled"}
                 label={label || "unlabeled"}
                 tasks={tasks}
                 handleUpdateTask={handleUpdateTask}

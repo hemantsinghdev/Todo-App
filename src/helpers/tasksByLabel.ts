@@ -1,8 +1,14 @@
 import TLabel from "@/types/label";
 import TTask from "@/types/task";
 
-const getTasksByLabel = (labels: TLabel[], tasks: TTask[]) => {
-  const labeledTasks: { [labelName: string]: TTask[] } = {};
+const getTasksByLabel = (
+  labels: TLabel[],
+  tasks: TTask[],
+  includeUnlabelled: boolean
+) => {
+  const labeledTasks: {
+    [labelId: string]: { labelName: string; tasks: TTask[] };
+  } = {};
   const unlabeledTasks: TTask[] = [];
   const taskIndex: { [labelId: string]: TTask[] } = {};
 
@@ -18,10 +24,20 @@ const getTasksByLabel = (labels: TLabel[], tasks: TTask[]) => {
   }
 
   for (const label of labels) {
-    labeledTasks[label.labelName] = taskIndex[label.localId] || [];
+    if (taskIndex[label.localId] && taskIndex[label.localId].length > 0) {
+      labeledTasks[label.localId] = {
+        labelName: label.labelName,
+        tasks: taskIndex[label.localId],
+      };
+    }
   }
 
-  labeledTasks["unlabeled"] = unlabeledTasks;
+  if (includeUnlabelled) {
+    labeledTasks["unlabelled"] = {
+      labelName: "unlabelled",
+      tasks: unlabeledTasks,
+    };
+  }
 
   return labeledTasks;
 };
